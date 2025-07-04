@@ -1,9 +1,9 @@
 import {createPool} from 'mysql2/promise'
 import {PORT,BD_HOST,BD_USER,BD_PASSWORD,BD_PORT,BD_DATABASE} from  '../config.js'
 export const pool = createPool({
-    host: BD_HOST,
-    user:BD_USER,
-    password:BD_PASSWORD,
-    port:BD_PORT,
-    database: BD_DATABASE
+    host: 'crossover.proxy.rlwy.net',
+    user:'root',
+    password:'JSqwrsvehPwsdADYTxIHpRMUixzgzPlu',
+    port:'36289',
+    database: 'railway'
 })
