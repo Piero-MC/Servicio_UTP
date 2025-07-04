@@ -1,7 +1,7 @@
 import {pool} from '../db.js'
 export const getUtp = async (req,res)=> {
   try{
-    const [rows]= await pool.query ('select * from utp_bd')
+    const [rows]= await pool.query ('SELECT  u.utp_cod AS codigo,u.utp_nombre AS nombre,u.utp_dni  AS dni, r.restric_motivo  AS restriccion,rl.rol AS rol, s.sede AS sede FROM utp_bd  AS u INNER JOIN restric AS r ON r.restric_id = u.utp_restric INNER JOIN rol     AS rl ON rl.rol_id  = u.utp_rol INNER JOIN sede    AS s  ON s.sede_id    = u.utp_sede')
     res.json(rows)
   } catch(error){
     return res.status(500).json({
@@ -12,7 +12,7 @@ export const getUtp = async (req,res)=> {
 
 export const getUtpDNI = async (req,res)=> {
   try {
-    const [rows]= await pool.query ("select*from utp_bd where utp_dni=?",[req.params.id])
+    const [rows]= await pool.query ("select   u.utp_cod AS codigo,u.utp_nombre AS nombre,u.utp_dni  AS dni, r.restric_motivo  AS restriccion,rl.rol AS rol, s.sede AS sede  from utp_bd  AS u INNER JOIN restric AS r ON r.restric_id = u.utp_restric INNER JOIN rol     AS rl ON rl.rol_id  = u.utp_rol INNER JOIN sede    AS s  ON s.sede_id    = u.utp_sede where utp_dni=?",[req.params.id])
   
     if (rows.length<=0) return res.status(404).json({
       message:'Trabajador no encontrado'
