@@ -28,16 +28,29 @@ export const getRegistroFiltro = async (req,res)=> {
     const p = s => (s?.trim() === '' ? null : s);
   try {
     const [rows]= await pool.query (
-        `SELECT r.*
-         FROM registro r
-        WHERE r.registro_dni             = COALESCE(?, r.registro_dni)
-          AND r.registro_tipo_ingresante = COALESCE(?, r.registro_tipo_ingresante)
-          AND r.registro_motivo          = COALESCE(?, r.registro_motivo)
-          AND r.estado                   = COALESCE(?, r.estado)
-          AND r.registro_sede             = COALESCE(?, r.registro_sede)
-          AND r.registro_ingreso_fecha BETWEEN
-              COALESCE(?, r.registro_ingreso_fecha)
-          AND COALESCE(?, r.registro_ingreso_fecha)`, 
+        `SELECT
+          r.id_registro,
+          r.registro_nombre        AS nombre,
+          r.registro_dni           AS dni,
+          i.ingresante_detalle     AS tipo_ingresante,
+          m.motivo_detalle         AS motivo,
+          s.sede                   AS sede,
+          r.registro_ingreso_fecha,
+          r.estado                
+          FROM   registro   AS r
+          INNER  JOIN ingresante AS i ON i.id_ingresante = r.registro_tipo_ingresante
+          INNER  JOIN motivo     AS m ON m.id_motivo     = r.registro_motivo
+          INNER  JOIN sede       AS s ON s.sede_id       = r.registro_sede
+          WHERE  r.registro_dni             = COALESCE(?, r.registro_dni)
+            AND  r.registro_tipo_ingresante = COALESCE(?, r.registro_tipo_ingresante)
+            AND  r.registro_motivo          = COALESCE(?, r.registro_motivo)
+            AND  r.estado                   = COALESCE(?, r.estado)
+            AND  r.registro_sede            = COALESCE(?, r.registro_sede)
+            AND  r.registro_ingreso_fecha BETWEEN
+                COALESCE(?, r.registro_ingreso_fecha)     -- fecha inicio
+                AND
+                COALESCE(?, r.registro_ingreso_fecha)     -- fecha fin
+          ORDER BY r.id_registro;`, 
         [
           p(dni),
           p(tipo),
@@ -51,7 +64,7 @@ export const getRegistroFiltro = async (req,res)=> {
      res.json(rows);
 
   } catch (error){
-     console.error(err);
+    
       res.status(500).json({ message: 'Error al consultar registros' });
   }
 }
@@ -77,6 +90,165 @@ export const getRegistroStatSede= async (req,res)=>{
           [
             p(year),
             p(mes)
+          ]
+      )
+      res.json(rows);
+
+    } catch (error){
+      console.error(err);
+        res.status(500).json({ message: 'Error al consultar registros' });
+    }
+}
+
+export const getRegistroStatMotivo= async (req,res)=>{
+   const {
+      mes,       
+      year,
+      sede           
+    } = req.query
+
+    const p = s => (s?.trim() === '' ? null : s);
+    try {
+      const [rows]= await pool.query (
+          `SELECT  m.motivo_detalle AS motivo,
+          COUNT(*)         AS total
+          FROM    registro AS r
+          JOIN    motivo   AS m ON m.id_motivo = r.registro_motivo
+          JOIN    sede     AS s ON s.sede_id   = r.registro_sede
+          WHERE   YEAR(r.registro_ingreso_fecha)  = ?
+            AND   MONTH(r.registro_ingreso_fecha) = ?
+            AND   s.sede = COALESCE( ? , s.sede)  
+          GROUP BY m.id_motivo;`, 
+          [
+            p(year),
+            p(mes),
+            p(sede)
+          ]
+      )
+      res.json(rows);
+
+    } catch (error){
+      console.error(err);
+        res.status(500).json({ message: 'Error al consultar registros' });
+    }
+}
+
+export const getRegistroStatEstado= async (req,res)=>{
+   const {
+      mes,       
+      year,
+      sede           
+    } = req.query
+
+    const p = s => (s?.trim() === '' ? null : s);
+    try {
+      const [rows]= await pool.query (
+          `SELECT  r.estado,
+           COUNT(*) AS total
+            FROM    registro r
+            JOIN    sede     AS s ON s.sede_id   = r.registro_sede
+            WHERE   YEAR(r.registro_ingreso_fecha)  = ? 
+              AND   MONTH(r.registro_ingreso_fecha) = ?
+              AND   s.sede = COALESCE(?, s.sede)  
+            GROUP BY r.estado`, 
+          [
+            p(year),
+            p(mes),
+            p(sede)
+          ]
+      )
+      res.json(rows);
+
+    } catch (error){
+      console.error(err);
+        res.status(500).json({ message: 'Error al consultar registros' });
+    }
+}
+
+export const getRegistroStatIngresante= async (req,res)=>{
+   const {
+      mes,       
+      year,
+      sede           
+    } = req.query
+
+    const p = s => (s?.trim() === '' ? null : s);
+    try {
+      const [rows]= await pool.query (
+          `SELECT  i.ingresante_detalle,
+          COUNT(*) AS total
+          FROM    registro r
+          JOIN    ingresante     AS i ON i.id_ingresante   = r.registro_tipo_ingresante
+          JOIN    sede     AS s ON s.sede_id   = r.registro_sede
+          WHERE   YEAR(r.registro_ingreso_fecha)  = ? 
+            AND   MONTH(r.registro_ingreso_fecha) = ?
+            AND   s.sede = COALESCE(?, s.sede)  
+          GROUP BY i.ingresante_detalle`, 
+          [
+            p(year),
+            p(mes),
+            p(sede)
+          ]
+      )
+      res.json(rows);
+
+    } catch (error){
+      console.error(err);
+        res.status(500).json({ message: 'Error al consultar registros' });
+    }
+}
+
+export const getRegistroStatCantidadMes= async (req,res)=>{
+   const {    
+      year,
+      sede           
+    } = req.query
+
+    const p = s => (s?.trim() === '' ? null : s);
+    try {
+      const [rows]= await pool.query (
+          `SELECT  MONTH(r.registro_ingreso_fecha),
+          COUNT(*) AS total_anual
+          FROM    registro AS r
+          JOIN    sede     AS s ON s.sede_id = r.registro_sede
+          WHERE   YEAR(r.registro_ingreso_fecha) = ?   
+            AND   s.sede = COALESCE(?, s.sede)           
+          GROUP BY MONTH(r.registro_ingreso_fecha);`, 
+          [
+            p(year),
+            p(sede)
+          ]
+      )
+      res.json(rows);
+
+    } catch (error){
+      console.error(err);
+        res.status(500).json({ message: 'Error al consultar registros' });
+    }
+}
+
+export const getRegistroStatCantidadDia= async (req,res)=>{
+   const {    
+      year,
+      mes,
+      sede           
+    } = req.query
+
+    const p = s => (s?.trim() === '' ? null : s);
+    try {
+      const [rows]= await pool.query (
+          `SELECT  DAY(r.registro_ingreso_fecha),
+            COUNT(*) AS total_anual
+            FROM    registro AS r
+            JOIN    sede     AS s ON s.sede_id = r.registro_sede
+            WHERE   YEAR(r.registro_ingreso_fecha) = ? 
+              AND MONTH (R.registro_ingreso_fecha)=?
+              AND   s.sede = COALESCE(?, s.sede)           
+            GROUP BY DAY(r.registro_ingreso_fecha);`, 
+          [
+            p(year),
+            p(mes),
+            p(sede)
           ]
       )
       res.json(rows);
