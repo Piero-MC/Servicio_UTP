@@ -12,6 +12,20 @@ export const gethuella= async (req,res)=>{
   }
 }
 
+export const gethuellaHash= async (req,res)=>{
+  
+  try{
+    const [rows]= await pool.query ('select * from huella_persona where image_template=?',[req.params.id])
+    res.json(rows)
+  } catch(error){
+    return res.status(500).json({
+      message: 'Something goes wrong'
+    })
+  }
+}
+
+
+
 export const createUtp = async (req,res)=> {
     try {
       const {id,ndocumento,template,fecha} =req.body

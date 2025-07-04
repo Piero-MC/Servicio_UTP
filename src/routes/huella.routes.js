@@ -1,8 +1,10 @@
 import {Router} from 'express'
-import {gethuella,createUtp,deleteUtp} from '../controllers/huella.controller.js'
+import {gethuella,createUtp,deleteUtp,gethuellaHash} from '../controllers/huella.controller.js'
 const router= Router()
 
 router.get('/huella',gethuella)
+
+router.get('/huella/:id',gethuellaHash)
 
 router.post('/huella',createUtp)
 
