@@ -2,8 +2,6 @@ import {Router} from 'express'
 import {getUtp,createUtp,updateUtp,deleteUtp,getUtpDNI,getUtpCOD} from '../controllers/utp.controller.js'
 const router= Router()
 
-
-
 router.get('/utp',getUtp)
 
 router.get('/utp/:id',getUtpDNI)
