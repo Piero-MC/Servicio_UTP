@@ -18,7 +18,7 @@ app.use ('/api',huella_Routes)
 
 app.use((req,res,next) =>{
     res.status(404).json({
-        message:'endpoint not Fou)nd'
+        message:'endpoint not Found'
     })
 })
 
