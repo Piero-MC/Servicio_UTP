@@ -243,7 +243,7 @@ export const getRegistroStatCantidadDia= async (req,res)=>{
             FROM    registro AS r
             JOIN    sede     AS s ON s.sede_id = r.registro_sede
             WHERE   YEAR(r.registro_ingreso_fecha) = ? 
-              AND MONTH (R.registro_ingreso_fecha)=?
+              AND MONTH (r.registro_ingreso_fecha)=?
               AND   s.sede = COALESCE(?, s.sede)           
             GROUP BY DAY(r.registro_ingreso_fecha);`, 
           [
