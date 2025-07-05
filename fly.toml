@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for servicio-utp on 2025-07-04T20:27:59Z
+# fly.toml app configuration file generated for servicio-utp-bqosfw on 2025-07-05T00:14:23Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'servicio-utp'
+app = 'servicio-utp-bqosfw'
 primary_region = 'bog'
 
 [build]
