@@ -4,3 +4,5 @@ import  app from './app.js'
 app.listen(PORT)
 
 console.log("prueba servidor")
+
+console.log(PORT)
