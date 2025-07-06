@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {getRegistros,createRegistros,updateRegistros,deleteRegistros,getRegistroFiltro,getRegistroStatSede,getRegistroStatMotivo,getRegistroStatEstado,getRegistroStatIngresante,getRegistroStatCantidadMes,getRegistroStatCantidadDia} from '../controllers/registros.controller.js'
+import {getRegistros,createRegistros,getRegistroFiltro,getRegistroStatSede,getRegistroStatMotivo,getRegistroStatEstado,getRegistroStatIngresante,getRegistroStatCantidadMes,getRegistroStatCantidadDia} from '../controllers/registros.controller.js'
 const router= Router()
 
 router.get('/registros',getRegistros)
@@ -19,9 +19,5 @@ router.get('/registros/StatCantMes',getRegistroStatCantidadMes)
 router.get('/registros/StatCantDia',getRegistroStatCantidadDia)
 
 router.post('/registros',createRegistros)
-
-router.patch('/registros/:id',updateRegistros)
-
-router.delete('/registros/:id',deleteRegistros)
 
 export default router
